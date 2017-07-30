@@ -58,18 +58,10 @@ cm$overall['Accuracy']
 cm$table
 ```
 
-##conclusion
+##Conclusion
 Random Forest algorithm performed better with Accuracy nearly 100%.
 
 ## Quiz
-```{r echo=FALSE}
-common <- intersect(names(trainingSet), names(testData)) 
-for (p in common) { 
-  if (class(trainingSet[[p]]) == "factor") { 
-    levels(testData[[p]]) <- levels(trainingSet[[p]]) 
-  } 
-}
-```
 
 ```{r, echo= TRUE ,results=FALSE}
 qCol<-subset(rownames(naPerCol),rownames(naPerCol)!="classe")
