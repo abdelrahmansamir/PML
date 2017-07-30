@@ -1,0 +1,96 @@
+---
+title: "PML Project"
+output: html_document
+Auther: ahalawa
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r }
+#Loding libraries
+
+library(ggplot2)
+library(caret)
+library(randomForest)
+```
+
+## read training and test datasets
+
+```{r}
+trainData <- read.csv("D:/Abdelrahman/data science/wd/pml-training.csv", na.strings=c("NA", ""))
+testData <- read.csv("D:/Abdelrahman/data science/wd/pml-testing.csv",na.strings=c("NA", ""))
+```
+
+## Exploratory Analysis
+```{r}
+dim(trainData)
+head(trainData)
+```
+
+## Data Cleaning and Feature Engineering
+```{r}
+#remove unrelated columns
+trainData<-trainData[,-which(names(trainData)=="cvtd_timestamp")]
+trainData<-trainData[,-which(names(trainData)=="user_name")]
+
+#calculate NA ratio per column
+naPerCol <- as.data.frame(colSums(is.na(trainData))/nrow(trainData))
+names(naPerCol)<-"na"
+naPerCol<-subset(naPerCol, na ==0)
+trainData<-trainData[,rownames(naPerCol)]
+
+```
+
+## Model Training (including cross-validation)
+```{r}
+set.seed(5412)
+inTrain <- createDataPartition(y=trainData$classe, p = 0.7, list=FALSE)
+trainingSet <- trainData[inTrain,]
+testingSet <- trainData[-inTrain,]
+#model
+model <-  randomForest(classe ~. , data=trainingSet, method="class")
+pred<-predict(model,testingSet)
+cm<-confusionMatrix(pred,testingSet$classe)
+cm$overall['Accuracy']
+cm$table
+```
+
+##conclusion
+Random Forest algorithm performed better with Accuracy nearly 100%.
+
+## Quiz
+```{r echo=FALSE}
+common <- intersect(names(trainingSet), names(testData)) 
+for (p in common) { 
+  if (class(trainingSet[[p]]) == "factor") { 
+    levels(testData[[p]]) <- levels(trainingSet[[p]]) 
+  } 
+}
+```
+
+```{r, echo= TRUE ,results=FALSE}
+qCol<-subset(rownames(naPerCol),rownames(naPerCol)!="classe")
+testData<-testData[,qCol]
+predict(model,testData)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
