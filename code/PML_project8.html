@@ -120,6 +120,9 @@ $(document).ready(function () {
 </div>
 
 
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>This report gavies a brief explanation to how to use the <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a> dataset to make the predictions. Fristly I explore the data, clean the data, train the model, and then make predicttion.</p>
 <pre class="r"><code>#Loding libraries
 
 library(ggplot2)</code></pre>
@@ -136,6 +139,7 @@ library(ggplot2)</code></pre>
 <pre><code>## The following object is masked from 'package:ggplot2':
 ## 
 ##     margin</code></pre>
+</div>
 <div id="read-training-and-test-datasets" class="section level2">
 <h2>read training and test datasets</h2>
 <pre class="r"><code>trainData &lt;- read.csv(&quot;D:/Abdelrahman/data science/wd/pml-training.csv&quot;, na.strings=c(&quot;NA&quot;, &quot;&quot;))
@@ -436,17 +440,22 @@ trainData&lt;-trainData[,-which(names(trainData)==&quot;user_name&quot;)]
 #calculate NA ratio per column
 naPerCol &lt;- as.data.frame(colSums(is.na(trainData))/nrow(trainData))
 names(naPerCol)&lt;-&quot;na&quot;
+#only select the columns that have no missing values.
 naPerCol&lt;-subset(naPerCol, na ==0)
 trainData&lt;-trainData[,rownames(naPerCol)]</code></pre>
 </div>
 <div id="model-training-including-cross-validation" class="section level2">
 <h2>Model Training (including cross-validation)</h2>
-<pre class="r"><code>set.seed(5412)
+<p>I will use Random Forest model, because it always gives high accuracy as a role of thumb.</p>
+<pre class="r"><code># split the data
+set.seed(5412)
 inTrain &lt;- createDataPartition(y=trainData$classe, p = 0.7, list=FALSE)
 trainingSet &lt;- trainData[inTrain,]
 testingSet &lt;- trainData[-inTrain,]
 #model
 model &lt;-  randomForest(classe ~. , data=trainingSet, method=&quot;class&quot;)
+
+#Cross Validation:- To sense of the out of sample error.
 pred&lt;-predict(model,testingSet)
 cm&lt;-confusionMatrix(pred,testingSet$classe)
 cm$overall['Accuracy']</code></pre>
@@ -460,10 +469,11 @@ cm$overall['Accuracy']</code></pre>
 ##          C    0    0 1026    0    0
 ##          D    0    0    0  964    0
 ##          E    0    0    0    0 1082</code></pre>
+<p>As I expected RF gives high accuracy.</p>
 </div>
 <div id="conclusion" class="section level2">
 <h2>conclusion</h2>
-<p>Random Forest algorithm performed better with Accuracy nearly 100%.</p>
+<p>Random Forest algorithm performed better with Accuracy 100%.Thus, the sample error rate 0%</p>
 </div>
 <div id="quiz" class="section level2">
 <h2>Quiz</h2>

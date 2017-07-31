@@ -8,6 +8,8 @@ Auther: ahalawa
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Summary
+This report gavies a brief explanation to how to use the https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv dataset to make the predictions. Fristly I explore the data, clean the data, train the model, and then make predicttion.
 
 ```{r }
 #Loding libraries
@@ -39,27 +41,34 @@ trainData<-trainData[,-which(names(trainData)=="user_name")]
 #calculate NA ratio per column
 naPerCol <- as.data.frame(colSums(is.na(trainData))/nrow(trainData))
 names(naPerCol)<-"na"
+#only select the columns that have no missing values.
 naPerCol<-subset(naPerCol, na ==0)
 trainData<-trainData[,rownames(naPerCol)]
 
 ```
 
 ## Model Training (including cross-validation)
+I will use Random Forest model, because it always gives high accuracy as a role of thumb.  
+
 ```{r}
+# split the data
 set.seed(5412)
 inTrain <- createDataPartition(y=trainData$classe, p = 0.7, list=FALSE)
 trainingSet <- trainData[inTrain,]
 testingSet <- trainData[-inTrain,]
 #model
 model <-  randomForest(classe ~. , data=trainingSet, method="class")
+
+#Cross Validation:- To sense of the out of sample error.
 pred<-predict(model,testingSet)
 cm<-confusionMatrix(pred,testingSet$classe)
 cm$overall['Accuracy']
 cm$table
 ```
+As I expected RF gives high accuracy.
 
-##Conclusion
-Random Forest algorithm performed better with Accuracy nearly 100%.
+##conclusion
+Random Forest algorithm performed better with Accuracy 100%.Thus, the sample error rate 0%
 
 ## Quiz
 
